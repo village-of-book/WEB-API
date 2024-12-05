@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>位置情報取得&天気表示</title>
+  <style>
+    /* 表に線を表示する */
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>今日の天気</h1>
+    <div id="weather_icon"></div>
+  </header>
+  <main>
+    <table>
+      <tr>
+        <th>項目</th>
+        <th>値</th>
+      </tr>
+      <tr>
+        <td>緯度</td>
+        <td id="latitude"></td>
+      </tr>
+      <tr>
+        <td>経度</td>
+        <td id="longitude"></td>
+      </tr>
+      <tr>
+        <td>天気</td>
+        <td id="weather"></td>
+      </tr>
+      <tr>
+        <td>気温</td>
+        <td id="temperature"></td>
+      </tr>
+      <tr>
+        <td>湿度</td>
+        <td id="humidity"></td>
+      </tr>
+      <tr>
+        <td>気圧</td>
+        <td id="pressure"></td>
+      </tr>
+    </table>
+  </main>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- axiosライブラリの読み込み -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+  <script>
+      function getPositionSuccess(position){
+        console.log(position);
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log(lat,lng)
+
+        // 取得した緯度経度を使用したいので、APIキーを設定する
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=06a7c941fca3cc42e8df94e1f5395fdf&units=metric`;
+
+        axios.get(url)
+          .then(function(response){
+            console.log(response.data);
+            $('#temperature').text(response.data.main.temp)
+            $('#humidity').text(response.data.main.humidity)
+            $('#pressure').text(response.data.main.pressure)
+            $('#weather').text(response.data.weather[0].main)
+            $('#latitude').text(response.data.coord.lat)
+            $('#longitude').text(response.data.coord.lon)
+          });
+          }
+
+  //
+  function getPositionError(error){
+    const errorMessages = [
+    "位置情報が許可されてません",
+    "現在位置を特定できません",
+    "位置情報を取得する前にタイムアウトになりました",
+    ];
+    alert("error: " + errorMessages[error.code - 1]);
+  }
+
+  // geolocation.html
+  navigator.geolocation.getCurrentPosition(getPositionSuccess, getPositionError);
+
+
+
+
+  </script>
+</body>
+
+</html>
